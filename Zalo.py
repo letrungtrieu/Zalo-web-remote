@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait as W
 from selenium.webdriver.support import expected_conditions as E
 from threading import Thread
 from glob import glob
-import sys,os,time
+import sys,os,time,json
 
 
 
@@ -19,16 +19,15 @@ class Zalo(Thread):
             'excludeSwitches',
             ["enable-logging"]
         )
-        self.options.add_argument("--start-maximized")
         for user in glob('c:/users/*'):
             user_path = f'{user}/AppData/Local/Google/Chrome/User Data/'
             if os.path.isdir(user_path):
                 self.options.add_argument(f'user-data-dir={user_path}')
                 break
         
-        self.chrome = webdriver.Chrome("chromedriver.exe", options=self.options)
+        self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chromedriver.exe", options=self.options)
         self.chrome.get("https://zalo.me/zalo-chat")
-        self.wait_element = W(self.chrome, 30)
+        self.wait_element = W(self.chrome, 45)
         self.group_name = group_name
         self.group_id = group_id
         self.member_index_id = member_index_id
@@ -36,17 +35,17 @@ class Zalo(Thread):
         self.sleep = sleep
         self.is_stop = False
 
-    def send_msg_for_member_of_group(self,group_name, group_id, index_member, msg):
+    def send_msg_for_member_of_group(self):
 
         search_input: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
             "input#contact-search-input"
         )))
         search_input[0].click()
-        search_input[0].send_keys(group_name)
+        search_input[0].send_keys(self.group_name)
         search_item: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
-            f"div#group-item-g{group_id}"
+            f"div#group-item-g{self.group_id}"
         )))
         search_item[0].click()
 
@@ -61,12 +60,12 @@ class Zalo(Thread):
             "div.chat-box-member__info__name.v2"
         )))
         try:
-            name_el: WebElement = member_list[index_member].find_element_by_css_selector(
+            name_el: WebElement = member_list[self.member_index_id].find_element_by_css_selector(
                 "div.truncate")
             print(">>>>>>Gửi tin nhắn cho ", name_el.text)
         except:
             pass
-        member_list[index_member].click()
+        member_list[self.member_index_id].click()
 
         btn_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
@@ -78,16 +77,13 @@ class Zalo(Thread):
             By.CSS_SELECTOR,
             "div#input_line_0"
         )))
-        send_msg[0].send_keys(msg)
+        send_msg[0].send_keys(self.msg)
 
         btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
             "div.z--btn.z--btn--text--primary.-lg.--rounded.send-btn-chatbar.input-btn"
         )))
         btn_send_msg[0].click()
-        print(f"------STT   {index_member}-------")
-        print("------Đã gửi thành công-----")
-        print("-----------------------------------")
 
     def stop(self):
         self.is_stop = True
@@ -99,38 +95,39 @@ class Zalo(Thread):
             if self.is_stop:
                 break
             try:
-                self.send_msg_for_member_of_group(
-                    self.group_name,
-                    self.group_id,
-                    self.member_index_id,
-                    self.msg
-                )
+                self.send_msg_for_member_of_group()
+                print(f"------STT   {self.member_index_id}-------")
+                print("------Đã gửi thành công-----")
+                print("----------------------------------------------------------------")
                 self.member_index_id += 1
                 time.sleep(self.sleep)
-            except:
-                self.chrome.close()
+            except Exception as e:
+                kill_all_chrome()
                 self.chrome = webdriver.Chrome("chromedriver.exe", options=self.options)
                 self.chrome.get("https://zalo.me/zalo-chat")
+                self.wait_element = W(self.chrome, 45)
 
 def read_str():
     fd = sys.stdin.fileno()
-    return (os.read(fd,1024).replace(b'\r\n',b'')).decode('utf-8')
+    input = os.read(fd,1024)
+    return input.replace(b'\r\n',b'').decode('utf-8')
 
 def get_info():
     os.system('cls' if os.name=='nt' else 'clear')
     try:
-        print("Nhap ten group:")
-        group_name = read_str()
-        print("Nhap group id:")
-        group_id = read_str()
-        print("Nhap id member:")
-        index_member = int(read_str())
-        print("Nhap noi dung tin nhan:")
-        message = read_str()
-        print("Nhap time sleep:")
-        time_sleep = float(read_str())
-        return (group_name, group_id, index_member, message, time_sleep)
-    except:
+        print("Nhập đường dẫn đến file json:")
+        with open('config.json',  encoding="utf8") as f:
+            file = f.read()
+            config = json.loads(file)
+            group_name=config["groupName"]
+            group_id=config["groupId"]
+            index_member=config["memberId"]
+            message=config["msg"]
+            time_sleep=config["delay"]
+            return (group_name, group_id, index_member, message, time_sleep)
+    except Exception as e:
+        print("Không tìm thấy file, hoặc định dạng sai! Ấn enter để tiếp tục!", e)
+        read_str()
         get_info()
 
 def kill_all_chrome():
