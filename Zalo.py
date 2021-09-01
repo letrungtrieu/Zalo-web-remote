@@ -116,7 +116,7 @@ def get_info():
     os.system('cls' if os.name=='nt' else 'clear')
     try:
         print("Nhập đường dẫn đến file json:")
-        with open('config.json',  encoding="utf8") as f:
+        with open('config.json',  "r") as f:
             file = f.read()
             config = json.loads(file)
             group_name=config["groupName"]
