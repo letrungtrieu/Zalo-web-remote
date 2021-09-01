@@ -102,7 +102,7 @@ class Zalo(Thread):
                 self.member_index_id += 1
                 time.sleep(self.sleep)
             except Exception as e:
-                kill_all_chrome()
+                kill_all_chrome() 
                 self.chrome = webdriver.Chrome("chromedriver.exe", options=self.options)
                 self.chrome.get("https://zalo.me/zalo-chat")
                 self.wait_element = W(self.chrome, 45)
