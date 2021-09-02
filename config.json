@@ -1,6 +1,7 @@
 {
     "HP": {
         "Person 1": {
+            "proxy":"",
             "groupName": "room svnm",
             "groupId": "196138084922274503",
             "memberId": 0,
@@ -8,6 +9,7 @@
             "delay": 5
         },
         "Person 2": {
+            "proxy":"",
             "groupName": "room svnm",
             "groupId": "196138084922274503",
             "memberId": 0,

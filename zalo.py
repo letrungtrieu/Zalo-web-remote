@@ -11,13 +11,15 @@ import os,time
 
 class Zalo(Thread):
     
-    def __init__(self, user_path, group_name: str, group_id: str, member_index_id: int, msg: str, sleep: float):
+    def __init__(self, user_path, proxy:str, group_name: str, group_id: str, member_index_id: int, msg: str, sleep: float):
         Thread.__init__(self)
         self.options = Options()
         self.options.add_experimental_option(
             'excludeSwitches',
             ["enable-logging"]
         )
+        if proxy:
+            self.options.add_argument(f'--proxy-server=http://{proxy}')
         self.options.add_argument(f'user-data-dir={user_path}')
         self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
         self.chrome.get("https://zalo.me/zalo-chat")
