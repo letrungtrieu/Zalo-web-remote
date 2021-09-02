@@ -5,14 +5,13 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait as W
 from selenium.webdriver.support import expected_conditions as E
 from threading import Thread
-from glob import glob
-import sys,os,time,json
+import os,time
 
 
 
 class Zalo(Thread):
     
-    def __init__(self, user_path,group_name: str, group_id: str, member_index_id: int, msg: str, sleep: float):
+    def __init__(self, user_path, group_name: str, group_id: str, member_index_id: int, msg: str, sleep: float):
         Thread.__init__(self)
         self.options = Options()
         self.options.add_experimental_option(
@@ -20,7 +19,7 @@ class Zalo(Thread):
             ["enable-logging"]
         )
         self.options.add_argument(f'user-data-dir={user_path}')
-        self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chromedriver.exe", options=self.options)
+        self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
         self.chrome.get("https://zalo.me/zalo-chat")
         self.wait_element = W(self.chrome, 45)
         self.group_name = group_name
@@ -103,36 +102,3 @@ class Zalo(Thread):
                 self.chrome = webdriver.Chrome("chromedriver.exe", options=self.options)
                 self.chrome.get("https://zalo.me/zalo-chat")
                 self.wait_element = W(self.chrome, 45)
-
-def read_str():
-    fd = sys.stdin.fileno()
-    input = os.read(fd,1024)
-    return input.replace(b'\r\n',b'').decode('utf-8')
-
-def get_info():
-    os.system('cls' if os.name=='nt' else 'clear')
-    try:
-        print("Nhập đường dẫn đến file json:")
-        with open('config.json',  encoding='utf-8') as f:
-            file = f.read()
-            config = json.loads(file)
-            group_name=config["groupName"]
-            group_id=config["groupId"]
-            index_member=config["memberId"]
-            message=config["msg"]
-            time_sleep=config["delay"]
-            return (group_name, group_id, index_member, message, time_sleep)
-    except Exception as e:
-        print("Không tìm thấy file, hoặc định dạng sai! Ấn enter để tiếp tục!", e)
-        read_str()
-        get_info()
-
-if __name__ == '__main__':
-    while True:
-        group_name, group_id, index_member, message, time_sleep = get_info()
-        zalo = Zalo(group_name, group_id, index_member, message, time_sleep)
-        zalo.start()
-        read_str()
-        zalo.stop()
-        break
-        

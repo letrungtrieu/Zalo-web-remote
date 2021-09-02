@@ -1,16 +1,18 @@
 {
-    "Person 1":{
-        "groupName":"room svnm",
-        "groupId":"196138084922274503",
-        "memberId": 0,
-        "msg":"Trời nóng như đổ lửa. Em nằm ngửa trên chiếc ghế sofa.",
-        "delay": 5
-    },
-    "Person 2":{
-        "groupName":"room svnm",
-        "groupId":"196138084922274503",
-        "memberId": 0,
-        "msg":"Trời nóng như đổ lửa. Em nằm ngửa trên chiếc ghế sofa.",
-        "delay": 5
+    "HP": {
+        "Person 1": {
+            "groupName": "room svnm",
+            "groupId": "196138084922274503",
+            "memberId": 0,
+            "msg": "Trời nóng như đổ lửa. Em nằm ngửa trên chiếc ghế sofa.",
+            "delay": 5
+        },
+        "Person 2": {
+            "groupName": "room svnm",
+            "groupId": "196138084922274503",
+            "memberId": 0,
+            "msg": "Trời nóng như đổ lửa. Em nằm ngửa trên chiếc ghế sofa.",
+            "delay": 5
+        }
     }
 }
