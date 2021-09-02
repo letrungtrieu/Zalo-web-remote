@@ -21,7 +21,7 @@ class Zalo(Thread):
         self.options.add_argument(f'user-data-dir={user_path}')
         self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
         self.chrome.get("https://zalo.me/zalo-chat")
-        self.wait_element = W(self.chrome, 45)
+        self.wait_element = W(self.chrome, 120)
         self.group_name = group_name
         self.group_id = group_id
         self.member_index_id = member_index_id
@@ -102,4 +102,4 @@ class Zalo(Thread):
                 del self.chrome
                 self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
                 self.chrome.get("https://zalo.me/zalo-chat")
-                self.wait_element = W(self.chrome, 45)
+                self.wait_element = W(self.chrome, 120)
