@@ -1,6 +1,7 @@
+chrome/User
 dist
 build
 venv
 __pycache__
 *.spec
-*.exe
+test.py

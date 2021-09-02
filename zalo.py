@@ -12,19 +12,14 @@ import sys,os,time,json
 
 class Zalo(Thread):
     
-    def __init__(self, group_name: str, group_id: str, member_index_id: int, msg: str, sleep: float):
+    def __init__(self, user_path,group_name: str, group_id: str, member_index_id: int, msg: str, sleep: float):
         Thread.__init__(self)
         self.options = Options()
         self.options.add_experimental_option(
             'excludeSwitches',
             ["enable-logging"]
         )
-        for user in glob('c:/users/*'):
-            user_path = f'{user}/AppData/Local/Google/Chrome/User Data/'
-            if os.path.isdir(user_path):
-                self.options.add_argument(f'user-data-dir={user_path}')
-                break
-        
+        self.options.add_argument(f'user-data-dir={user_path}')
         self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chromedriver.exe", options=self.options)
         self.chrome.get("https://zalo.me/zalo-chat")
         self.wait_element = W(self.chrome, 45)
@@ -102,7 +97,9 @@ class Zalo(Thread):
                 self.member_index_id += 1
                 time.sleep(self.sleep)
             except Exception as e:
-                kill_all_chrome() 
+                print(e)
+                time.sleep(10)
+                self.chrome.close()
                 self.chrome = webdriver.Chrome("chromedriver.exe", options=self.options)
                 self.chrome.get("https://zalo.me/zalo-chat")
                 self.wait_element = W(self.chrome, 45)
@@ -116,7 +113,7 @@ def get_info():
     os.system('cls' if os.name=='nt' else 'clear')
     try:
         print("Nhập đường dẫn đến file json:")
-        with open('config.json',  "r") as f:
+        with open('config.json',  encoding='utf-8') as f:
             file = f.read()
             config = json.loads(file)
             group_name=config["groupName"]
@@ -130,14 +127,9 @@ def get_info():
         read_str()
         get_info()
 
-def kill_all_chrome():
-    os.system('taskkill /f /im chrome.exe')
-    os.system('cls' if os.name=='nt' else 'clear')
-
 if __name__ == '__main__':
     while True:
         group_name, group_id, index_member, message, time_sleep = get_info()
-        kill_all_chrome()
         zalo = Zalo(group_name, group_id, index_member, message, time_sleep)
         zalo.start()
         read_str()
