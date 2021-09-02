@@ -34,8 +34,3 @@ if __name__=='__main__':
     
     for zalo in zalos:
         zalo.start()
-    
-    while True:
-        read_str()
-        kill_all_chrome()
-    

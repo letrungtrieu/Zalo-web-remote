@@ -96,9 +96,10 @@ class Zalo(Thread):
                 self.member_index_id += 1
                 time.sleep(self.sleep)
             except Exception as e:
-                print(e)
+                print("Có lỗi xảy ra ddang khởi động lại Chrome")
                 time.sleep(10)
-                self.chrome.close()
-                self.chrome = webdriver.Chrome("chromedriver.exe", options=self.options)
+                self.chrome.quit()
+                del self.chrome
+                self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
                 self.chrome.get("https://zalo.me/zalo-chat")
                 self.wait_element = W(self.chrome, 45)
