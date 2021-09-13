@@ -27,11 +27,12 @@ if __name__=='__main__':
             config = configs[dir]
             group_name=config["groupName"]
             group_id=config["groupId"]
-            index_member=config["memberId"]
+            index_start_member=config["memberId"]
+            index_stop_member=config["memberId"]
             message=config["msg"]
             time_sleep=config["delay"]
             proxy = config["proxy"]
-            zalos.append(Zalo(f'C:\\Users\\{pc}\\AppData\\Local\\Google\\Chrome\\{dir}\\User Data', proxy, group_name, group_id, index_member, message, time_sleep))
+            zalos.append(Zalo(f'C:\\Users\\{pc}\\AppData\\Local\\Google\\Chrome\\{dir}\\User Data', proxy, group_name, group_id, index_start_member, index_stop_member, message, time_sleep))
     
     for zalo in zalos:
         zalo.start()

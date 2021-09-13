@@ -5,6 +5,7 @@
             "groupName": "room svnm",
             "groupId": "196138084922274503",
             "memberId": 0,
+            "memberEndId":120,
             "msg": "Trời nóng như đổ lửa. Em nằm ngửa trên chiếc ghế sofa.",
             "delay": 5
         },
@@ -13,6 +14,7 @@
             "groupName": "room svnm",
             "groupId": "196138084922274503",
             "memberId": 0,
+            "memberEndId":120,
             "msg": "Trời nóng như đổ lửa. Em nằm ngửa trên chiếc ghế sofa.",
             "delay": 5
         }

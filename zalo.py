@@ -11,7 +11,7 @@ import os,time
 
 class Zalo(Thread):
     
-    def __init__(self, user_path, proxy:str, group_name: str, group_id: str, member_index_id: int, msg: str, sleep: float):
+    def __init__(self, user_path, proxy:str, group_name: str, group_id: str, member_index_id: int, member_index_stop_id: int, msg: str, sleep: float):
         Thread.__init__(self)
         self.options = Options()
         self.options.add_experimental_option(
@@ -27,6 +27,7 @@ class Zalo(Thread):
         self.group_name = group_name
         self.group_id = group_id
         self.member_index_id = member_index_id
+        self.member_index_stop_id = member_index_stop_id
         self.msg = msg
         self.sleep = sleep
         self.is_stop = False
@@ -88,7 +89,7 @@ class Zalo(Thread):
 
     def run(self):
         while True:
-            if self.is_stop:
+            if self.is_stop or self.member_index_id == self.member_index_stop_id:
                 break
             try:
                 self.send_msg_for_member_of_group()
