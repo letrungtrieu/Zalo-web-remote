@@ -1,0 +1,1 @@
+pyinstaller.exe --onefile --icon=icon.ico ./main.py

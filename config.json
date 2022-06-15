@@ -1,22 +1,13 @@
 {
-    "HP": {
+    "admin": {
         "Person 1": {
             "proxy":"",
-            "groupName": "room svnm",
-            "groupId": "196138084922274503",
-            "memberId": 0,
-            "memberEndId":120,
-            "msg": "Trời nóng như đổ lửa. Em nằm ngửa trên chiếc ghế sofa.",
-            "delay": 5
-        },
-        "Person 2": {
-            "proxy":"",
-            "groupName": "room svnm",
-            "groupId": "196138084922274503",
-            "memberId": 0,
-            "memberEndId":120,
-            "msg": "Trời nóng như đổ lửa. Em nằm ngửa trên chiếc ghế sofa.",
-            "delay": 5
+            "groupName": "GIANG HỒ",
+            "groupId": "8754907914640068096",
+            "memberId":0,
+            "memberEndId":10,
+            "msg": "Tụ linh đàn lần sau ae nhường mình top 1 nha",
+            "delay": 130
         }
     }
 }

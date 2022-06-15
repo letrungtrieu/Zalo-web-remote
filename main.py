@@ -28,7 +28,7 @@ if __name__=='__main__':
             group_name=config["groupName"]
             group_id=config["groupId"]
             index_start_member=config["memberId"]
-            index_stop_member=config["memberId"]
+            index_stop_member=config["memberEndId"]
             message=config["msg"]
             time_sleep=config["delay"]
             proxy = config["proxy"]
