@@ -1,13 +1,10 @@
 {
-    "admin": {
-        "Person 1": {
-            "proxy":"",
-            "groupName": "GIANG HỒ",
-            "groupId": "8754907914640068096",
-            "memberId":0,
-            "memberEndId":10,
-            "msg": "Tụ linh đàn lần sau ae nhường mình top 1 nha",
-            "delay": 130
-        }
+    "Person 1": {
+        "proxy":"",
+        "groupName": "bet",
+        "memberId":1,
+        "memberEndId":2,
+        "msg": "Alo ae test xiu nah",
+        "delay": 5
     }
 }

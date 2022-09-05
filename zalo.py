@@ -11,21 +11,21 @@ import os,time
 
 class Zalo(Thread):
     
-    def __init__(self, user_path, proxy:str, group_name: str, group_id: str, member_index_id: int, member_index_stop_id: int, msg: str, sleep: float):
+    def __init__(self, user_path, proxy:str, group_name: str, member_index_id: int, member_index_stop_id: int, msg: str, sleep: float):
         Thread.__init__(self)
         self.options = Options()
         self.options.add_experimental_option(
             'excludeSwitches',
             ["enable-logging"]
         )
+        self.options.binary_location = f'chrome/bin/chrome.exe'
         if proxy:
             self.options.add_argument(f'--proxy-server=http://{proxy}')
-        self.options.add_argument(f'user-data-dir={user_path}')
-        self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
+        self.options.add_argument(f'user-data-dir={os.getcwd()}\\profiles\\{user_path}')
+        self.chrome = webdriver.Chrome(f"chrome/chromedriver.exe", options=self.options)
         self.chrome.get("https://zalo.me/zalo-chat")
         self.wait_element = W(self.chrome, 120)
         self.group_name = group_name
-        self.group_id = group_id
         self.member_index_id = member_index_id
         self.member_index_stop_id = member_index_stop_id
         self.msg = msg
@@ -42,7 +42,7 @@ class Zalo(Thread):
         search_input[0].send_keys(self.group_name)
         search_item: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
-            f"div#group-item-g{self.group_id}"
+            f'div[id*="group-item-g"]'
         )))
         search_item[0].click()
 
@@ -56,12 +56,10 @@ class Zalo(Thread):
             By.CSS_SELECTOR,
             "div.chat-box-member__info__name.v2"
         )))
-        try:
-            name_el: WebElement = member_list[self.member_index_id].find_element_by_css_selector(
-                "div.truncate")
-            print(">>>>>>Gửi tin nhắn cho ", name_el.text)
-        except:
-            pass
+        name_el: WebElement = member_list[self.member_index_id].find_element_by_css_selector(
+            "div.truncate")
+        print(">>>>>>Gửi tin nhắn cho ", name_el.text)
+        
         member_list[self.member_index_id].click()
 
         btn_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
@@ -69,7 +67,7 @@ class Zalo(Thread):
             'div[data-id="btn_UserProfile_SendMsg"]'
         )))
         btn_msg[0].click()
-
+        time.sleep(2)
         send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
             "div#input_line_0"
@@ -89,20 +87,22 @@ class Zalo(Thread):
 
     def run(self):
         while True:
-            if self.is_stop or self.member_index_id == self.member_index_stop_id:
+            # try:
+            self.send_msg_for_member_of_group()
+            print(f"------STT   {self.member_index_id}-------")
+            print("------Đã gửi thành công-----")
+            print("----------------------------------------------------------------")
+            self.member_index_id += 1
+            if self.is_stop or self.member_index_id > self.member_index_stop_id:
+                print(f"Group {self.group_name} OK rồi nha ")
                 break
-            try:
-                self.send_msg_for_member_of_group()
-                print(f"------STT   {self.member_index_id}-------")
-                print("------Đã gửi thành công-----")
-                print("----------------------------------------------------------------")
-                self.member_index_id += 1
-                time.sleep(self.sleep)
-            except Exception as e:
-                print("Có lỗi xảy ra ddang khởi động lại Chrome")
-                time.sleep(10)
-                self.chrome.quit()
-                del self.chrome
-                self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
-                self.chrome.get("https://zalo.me/zalo-chat")
-                self.wait_element = W(self.chrome, 120)
+            time.sleep(self.sleep)
+            # except Exception as e:
+            #     print(e)
+            #     print("Có lỗi xảy ra đang khởi động lại Chrome")
+            #     time.sleep(10)
+            #     self.chrome.quit()
+            #     del self.chrome
+            #     self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
+            #     self.chrome.get("https://zalo.me/zalo-chat")
+            #     self.wait_element = W(self.chrome, 120)

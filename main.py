@@ -1,5 +1,5 @@
 from zalo import Zalo
-import json, zipfile
+import json
 import os,sys
 
 def read_str():
@@ -18,21 +18,15 @@ if __name__=='__main__':
     with open('config.json',  encoding='utf-8') as f:
         file = f.read()
         configs:dict = json.loads(file)
-        pc = list(configs.keys())[0]
-        configs = configs[pc]
         for dir in list(configs.keys()):
-            if not os.path.exists(f'C:\\Users\\{pc}\\AppData\\Local\\Google\\Chrome\\{dir}'):
-                zipfile.ZipFile('chrome/User Data.zip').extractall(f'C:\\Users\\{pc}\\AppData\\Local\\Google\\Chrome\\{dir}')
-            
             config = configs[dir]
             group_name=config["groupName"]
-            group_id=config["groupId"]
             index_start_member=config["memberId"]
             index_stop_member=config["memberEndId"]
             message=config["msg"]
             time_sleep=config["delay"]
             proxy = config["proxy"]
-            zalos.append(Zalo(f'C:\\Users\\{pc}\\AppData\\Local\\Google\\Chrome\\{dir}\\User Data', proxy, group_name, group_id, index_start_member, index_stop_member, message, time_sleep))
+            zalos.append(Zalo(dir, proxy, group_name, index_start_member, index_stop_member, message, time_sleep))
     
     for zalo in zalos:
         zalo.start()
