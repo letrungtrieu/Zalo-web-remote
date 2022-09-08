@@ -58,6 +58,11 @@ class Zalo(Thread):
         )))
         name_el: WebElement = member_list[self.member_index_id].find_element_by_css_selector(
             "div.truncate")
+        if name_el.text == "Tài khoản bị khóa":
+            print(f"------STT   {self.member_index_id}-------")
+            print("------Tài khoản bị khóa-----")
+            print("----------------------------------------------------------------")
+            return
         print(">>>>>>Gửi tin nhắn cho ", name_el.text)
         
         member_list[self.member_index_id].click()
@@ -79,6 +84,9 @@ class Zalo(Thread):
             "div.z--btn.z--btn--text--primary.-lg.--rounded.send-btn-chatbar.input-btn"
         )))
         btn_send_msg[0].click()
+        print(f"------STT   {self.member_index_id}-------")
+        print("------Đã gửi thành công-----")
+        print("----------------------------------------------------------------")
 
     def stop(self):
         self.is_stop = True
@@ -89,9 +97,6 @@ class Zalo(Thread):
         while True:
             # try:
             self.send_msg_for_member_of_group()
-            print(f"------STT   {self.member_index_id}-------")
-            print("------Đã gửi thành công-----")
-            print("----------------------------------------------------------------")
             self.member_index_id += 1
             if self.is_stop or self.member_index_id > self.member_index_stop_id:
                 print(f"Group {self.group_name} OK rồi nha ")
