@@ -5,7 +5,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait as W
 from selenium.webdriver.support import expected_conditions as E
 from threading import Thread
-import os,time
+import os,time,re
 
 
 
@@ -13,6 +13,7 @@ class Zalo(Thread):
     
     def __init__(self, user_path, proxy:str, group_name: str, member_index_id: int, member_index_stop_id: int, msg: str, sleep: float):
         Thread.__init__(self)
+        self.profile = user_path
         self.options = Options()
         self.options.add_experimental_option(
             'excludeSwitches',
@@ -33,7 +34,7 @@ class Zalo(Thread):
         self.is_stop = False
 
     def send_msg_for_member_of_group(self):
-
+        print(f"------{self.profile}-------")
         search_input: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
             "input#contact-search-input"
@@ -51,42 +52,49 @@ class Zalo(Thread):
             "div.subtitle__groupmember__content.flx.flx-al-c.clickable"
         )))
         num_member[0].click()
-
+        time.sleep(5)
         member_list: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
             "div.chat-box-member__info__name.v2"
         )))
-        name_el: WebElement = member_list[self.member_index_id].find_element_by_css_selector(
-            "div.truncate")
-        if name_el.text == "Tài khoản bị khóa":
-            print(f"------STT   {self.member_index_id}-------")
-            print("------Tài khoản bị khóa-----")
-            print("----------------------------------------------------------------")
-            return
-        print(">>>>>>Gửi tin nhắn cho ", name_el.text)
+
+        while self.member_index_id < self.member_index_stop_id:
+            name_el: WebElement = member_list[self.member_index_id].find_element_by_css_selector("div.truncate")
+            name_member:str = name_el.text
+            flag = re.search("Tài khoản bị khóa", name_member)
+            if flag:
+                print(f"------STT   {self.member_index_id}-------")
+                print("------Tài khoản bị khóa-----")
+                print("----------------------------------------------------------------")
+                self.member_index_id +=1
+            else:
+                print(">>>>>>Gửi tin nhắn cho ", name_member)
+                member_list[self.member_index_id].click()
+                btn_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
+                    By.CSS_SELECTOR,
+                    'div[data-id="btn_UserProfile_SendMsg"]'
+                )))
+                btn_msg[0].click()
+                time.sleep(2)
+                send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
+                    By.CSS_SELECTOR,
+                    "div#input_line_0"
+                )))
+                send_msg[0].send_keys(self.msg)
+
+                btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
+                    By.CSS_SELECTOR,
+                    "div.z--btn.z--btn--text--primary.-lg.--rounded.send-btn-chatbar.input-btn"
+                )))
+                btn_send_msg[0].click()
+                print(f"------STT   {self.member_index_id}-------")
+                print("------Đã gửi thành công-----")
+                print("----------------------------------------------------------------")
+                time.sleep(self.sleep)
+                break
         
-        member_list[self.member_index_id].click()
-
-        btn_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
-            By.CSS_SELECTOR,
-            'div[data-id="btn_UserProfile_SendMsg"]'
-        )))
-        btn_msg[0].click()
-        time.sleep(2)
-        send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
-            By.CSS_SELECTOR,
-            "div#input_line_0"
-        )))
-        send_msg[0].send_keys(self.msg)
-
-        btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
-            By.CSS_SELECTOR,
-            "div.z--btn.z--btn--text--primary.-lg.--rounded.send-btn-chatbar.input-btn"
-        )))
-        btn_send_msg[0].click()
-        print(f"------STT   {self.member_index_id}-------")
-        print("------Đã gửi thành công-----")
-        print("----------------------------------------------------------------")
+        
+        
 
     def stop(self):
         self.is_stop = True
@@ -101,7 +109,6 @@ class Zalo(Thread):
             if self.is_stop or self.member_index_id > self.member_index_stop_id:
                 print(f"Group {self.group_name} OK rồi nha ")
                 break
-            time.sleep(self.sleep)
             # except Exception as e:
             #     print(e)
             #     print("Có lỗi xảy ra đang khởi động lại Chrome")
