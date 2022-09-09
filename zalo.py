@@ -61,7 +61,7 @@ class Zalo(Thread):
         while self.member_index_id < self.member_index_stop_id:
             name_el: WebElement = member_list[self.member_index_id].find_element_by_css_selector("div.truncate")
             name_member:str = name_el.text
-            flag = re.search("Tài khoản bị khóa", name_member)
+            flag = re.search("Tài khoản bị khóa", name_member) or re.search("Account(.*)Banned")
             if flag:
                 print(f"------STT   {self.member_index_id}-------")
                 print("------Tài khoản bị khóa-----")
