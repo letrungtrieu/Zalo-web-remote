@@ -23,8 +23,9 @@ class Zalo(Thread):
         if proxy:
             self.options.add_argument(f'--proxy-server=http://{proxy}')
         self.options.add_argument(f'user-data-dir={os.getcwd()}\\profiles\\{user_path}')
-        self.chrome = webdriver.Chrome(f"chrome/chromedriver.exe", options=self.options)
-        self.chrome.get("https://zalo.me/zalo-chat")
+        chrome = webdriver.Chrome(f"chrome/chromedriver.exe", options=self.options)
+        chrome.get("https://zalo.me/zalo-chat")
+        self.chrome = chrome
         self.wait_element = W(self.chrome, 120)
         self.group_name = group_name
         self.member_index_id = member_index_id
@@ -61,7 +62,9 @@ class Zalo(Thread):
         while self.member_index_id < self.member_index_stop_id:
             name_el: WebElement = member_list[self.member_index_id].find_element_by_css_selector("div.truncate")
             name_member:str = name_el.text
-            flag = re.search("Tài khoản bị khóa", name_member) or re.search("Account(.*)Banned")
+            if not name_member:
+                continue
+            flag = re.search("Tài khoản bị khóa", name_member) or re.search("Account(.*)Banned", name_member)
             if flag:
                 print(f"------STT   {self.member_index_id}-------")
                 print("------Tài khoản bị khóa-----")
@@ -84,7 +87,7 @@ class Zalo(Thread):
 
                 btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
                     By.CSS_SELECTOR,
-                    "div.z--btn.z--btn--text--primary.-lg.--rounded.send-btn-chatbar.input-btn"
+                    'div[data-translate-inner="STR_SEND"]'
                 )))
                 btn_send_msg[0].click()
                 print(f"------STT   {self.member_index_id}-------")
