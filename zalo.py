@@ -19,7 +19,7 @@ class Zalo(Thread):
             'excludeSwitches',
             ["enable-logging"]
         )
-        self.options.binary_location = f'chrome/bin/chrome.exe'
+        self.options.binary_location = f'bin/chrome.exe'
         if proxy:
             self.options.add_argument(f'--proxy-server=http://{proxy}')
         self.options.add_argument(f'user-data-dir={os.getcwd()}\\profiles\\{user_path}')
@@ -84,6 +84,12 @@ class Zalo(Thread):
                     "div#input_line_0"
                 )))
                 send_msg[0].send_keys(self.msg)
+
+                qick_message: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
+                                    By.CSS_SELECTOR,
+                                    'div[class="qri clickable active"]'
+                                )))
+                qick_message[0].click()
 
                 btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
                     By.CSS_SELECTOR,
