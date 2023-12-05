@@ -30,3 +30,4 @@ if __name__=='__main__':
     
     for zalo in zalos:
         zalo.start()
+        zalo.join()
