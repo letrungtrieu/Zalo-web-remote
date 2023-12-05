@@ -54,7 +54,7 @@ class Zalo(Thread):
             "div.subtitle__groupmember__content.flx.flx-al-c.clickable"
         )))
         num_member[0].click()
-        time.sleep(5)
+        time.sleep(1)
         member_list: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
             "div.chat-box-member__info__name.v2"
@@ -85,14 +85,14 @@ class Zalo(Thread):
                     "div#input_line_0"
                 )))
                 send_msg[0].send_keys(self.msg)
-
+                time.sleep(1)
                 qick_message: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
                                     By.CSS_SELECTOR,
                                     'div[class="qri clickable active"]'
                                 )))
                 time.sleep(3)
                 qick_message[0].click()
-
+                time.sleep(3)
                 btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
                     By.CSS_SELECTOR,
                     'div[data-translate-inner="STR_SEND"]'
