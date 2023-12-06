@@ -28,6 +28,9 @@ if __name__=='__main__':
             proxy = config["proxy"]
             zalos.append(Zalo(dir, proxy, group_name, index_start_member, index_stop_member, message, time_sleep))
     
+    
     for zalo in zalos:
-        zalo.start()
-        zalo.join()
+        t = zalo.start()
+    
+    for t in zalos:
+        t.join()

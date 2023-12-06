@@ -1,10 +1,18 @@
 {
-        "Person 1": {
-            "proxy":"",
-            "groupName": "SP",
-            "memberId": 1,
-            "memberEndId":5,
-            "msg": "/xinchao",
-            "delay": 120
-        }
+    "Person 1": {
+        "proxy":"",
+        "groupName": "SP",
+        "memberId": 1,
+        "memberEndId":5,
+        "msg": "/xinchao",
+        "delay": 120
+    },
+    "Person 2": {
+        "proxy":"",
+        "groupName": "SP",
+        "memberId": 1,
+        "memberEndId":5,
+        "msg": "/xinchao",
+        "delay": 120
+    }
 }
