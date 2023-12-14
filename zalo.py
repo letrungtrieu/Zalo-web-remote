@@ -76,7 +76,7 @@ class Zalo(Thread):
                 member_list[self.member_index_id].click()
                 btn_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
                     By.CSS_SELECTOR,
-                    'div[data-id="btn_UserProfile_SendMsg"]'
+                    'div[data-translate-inner="STR_CHAT"]'
                 )))
                 btn_msg[0].click()
                 time.sleep(2)
