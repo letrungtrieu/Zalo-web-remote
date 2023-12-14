@@ -7,34 +7,51 @@ from selenium.webdriver.support.ui import WebDriverWait as W
 from selenium.webdriver.support import expected_conditions as E
 from threading import Thread
 import os,time,re
+from util import *
 
 
 
 class Zalo(Thread):
     
-    def __init__(self, user_path, proxy:str, group_name: str, member_index_id: int, member_index_stop_id: int, msg: str, sleep: float):
+    def __init__(self, tree, item_id, group_name: str, member_start_id: int, member_end_id: int, msg: str, sleep: float, profile):
         Thread.__init__(self)
-        self.profile = user_path
-        self.options = Options()
-        self.options.add_experimental_option(
+        self.tree = tree
+        self.item_id = item_id
+        self.profile = profile
+        self.chrome = None
+        self.group_name = group_name
+        self.member_index_id = int(member_start_id)
+        self.member_index_stop_id = int(member_end_id)
+        self.msg = msg
+        self.sleep = float(sleep)
+        self.is_stop = False
+
+    def update(self, group_name: str, member_start_id: int, member_end_id: int, msg: str, sleep: float, profile):
+        self.profile = profile
+        self.chrome = None
+        self.group_name = group_name
+        self.member_index_id = int(member_start_id)
+        self.member_index_stop_id = int(member_end_id)
+        self.msg = msg
+        self.sleep = float(sleep)
+        self.is_stop = False
+    
+    def tree_update(self):
+        values = self.tree.item(self.item_id)['values']
+        values[1] = self.member_index_id + 1
+        self.tree.item(self.item_id, values=values)
+        save_config(self.tree)
+    
+    def get_options(self):
+        options = Options()
+        options.add_experimental_option(
             'excludeSwitches',
             ["enable-logging"]
         )
-        self.options.binary_location = f'bin/chrome.exe'
-        if proxy:
-            self.options.add_argument(f'--proxy-server=http://{proxy}')
-        self.options.add_argument(f'user-data-dir={os.getcwd()}\\profiles\\{user_path}')
-        chrome = webdriver.Chrome(service=Service(executable_path=f"chrome/chromedriver.exe"), options=self.options)
-        chrome.get("https://zalo.me/zalo-chat")
-        self.chrome = chrome
-        self.wait_element = W(self.chrome, 120)
-        self.group_name = group_name
-        self.member_index_id = member_index_id
-        self.member_index_stop_id = member_index_stop_id
-        self.msg = msg
-        self.sleep = sleep
-        self.is_stop = False
-
+        options.add_argument(f'user-data-dir={os.getcwd()}\\profiles\\{self.profile}')
+        options.binary_location = f'bin/chrome.exe'
+        return options
+    
     def send_msg_for_member_of_group(self):
         print(f"------{self.profile}-------")
         search_input: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
@@ -90,7 +107,7 @@ class Zalo(Thread):
                                     By.CSS_SELECTOR,
                                     'div[class="qri clickable active"]'
                                 )))
-                time.sleep(3)
+                time.sleep(0.5)
                 qick_message[0].click()
                 time.sleep(3)
                 btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
@@ -101,31 +118,40 @@ class Zalo(Thread):
                 print(f"------STT   {self.member_index_id}-------")
                 print("------Đã gửi thành công-----")
                 print("----------------------------------------------------------------")
+                self.tree_update()
                 time.sleep(self.sleep)
                 break
-        
-        
-        
 
     def stop(self):
         self.is_stop = True
-        self.chrome.close()
+        if self.chrome:
+            self.chrome.quit()
         del self
 
     def run(self):
+        chrome = webdriver.Chrome(service=Service(executable_path=f"chrome/chromedriver.exe"), options=self.get_options())
+        chrome.get("https://zalo.me/zalo-chat")
+        self.chrome = chrome
+        self.wait_element = W(self.chrome, 120)
+        
         while True:
-            # try:
-            self.send_msg_for_member_of_group()
-            self.member_index_id += 1
-            if self.is_stop or self.member_index_id > self.member_index_stop_id:
-                print(f"Group {self.group_name} OK rồi nha ")
+            try:
+                self.send_msg_for_member_of_group()
+                self.member_index_id += 1
+                if self.is_stop or self.member_index_id > self.member_index_stop_id:
+                    print(f"Group {self.group_name} OK rồi nha ")
+                    break
+            except Exception as e:
+                print(e)
+                self.stop()
                 break
-            # except Exception as e:
-            #     print(e)
-            #     print("Có lỗi xảy ra đang khởi động lại Chrome")
-            #     time.sleep(10)
-            #     self.chrome.quit()
-            #     del self.chrome
-            #     self.chrome = webdriver.Chrome(f"{os.getcwd()}\\chrome\\chromedriver.exe", options=self.options)
-            #     self.chrome.get("https://zalo.me/zalo-chat")
-            #     self.wait_element = W(self.chrome, 120)
+                # print("Có lỗi xảy ra đang khởi động lại Chrome")
+                # time.sleep(1)
+                # if self.is_stop or self.member_index_id > self.member_index_stop_id:
+                #     break
+                # if self.chrome:
+                #     self.chrome.quit()
+                #     del self.chrome
+                # self.chrome = webdriver.Chrome(service=Service(executable_path=f"chrome/chromedriver.exe"), options=self.get_options())
+                # self.chrome.get("https://zalo.me/zalo-chat")
+                # self.wait_element = W(self.chrome, 120)
