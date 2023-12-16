@@ -87,7 +87,9 @@ def start_action(action_window:tk.Toplevel, item_id):
     # Implement start action
     item = tree.item(item_id)
     zalo:Zalo = get_zalo(item)
-    ZALO_THREAD.remove(zalo)
+    if zalo is not None:
+        ZALO_THREAD.remove(zalo)
+        zalo.stop()
     zalo = Zalo(tree, item_id,*item['values'])
     ZALO_THREAD.append(zalo)
     zalo.start()
@@ -107,9 +109,9 @@ def stop_action(action_window:tk.Toplevel, item):
 def delete_action(action_window:tk.Toplevel, id):
     # Implement delete action
     item = tree.item(id)
-    stop_action(action_window, item)
     tree.delete(id)
     save_config(tree)
+    stop_action(action_window, item)
     action_window.destroy()
     print(f"Delete Action for {item['values']}")
 
@@ -133,10 +135,14 @@ def start_all():
         start_action(None,item_id)
 
 def stop_all():
-    for v in ZALO_THREAD:
-        v.stop()
-        ZALO_THREAD.remove(v)
-
+    clone = ZALO_THREAD.copy()
+    ZALO_THREAD.clear()
+    for v in clone:
+        try:
+            v.stop()
+        except:
+            pass
+        
 def create_ui():
     global root, tree
     root = tk.Tk()

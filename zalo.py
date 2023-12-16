@@ -8,7 +8,9 @@ from selenium.webdriver.support import expected_conditions as E
 from threading import Thread
 import os,time,re
 from util import *
+import logging
 
+_logger = logging.getLogger(__name__)
 
 
 class Zalo(Thread):
@@ -19,7 +21,7 @@ class Zalo(Thread):
         self.item_id = item_id
         self.profile = profile
         self.chrome = None
-        self.group_name = group_name
+        self.group_name = re.sub(r"[\n\r\t]", "", group_name)
         self.member_index_id = int(member_start_id)
         self.member_index_stop_id = int(member_end_id)
         self.msg = msg
@@ -29,7 +31,7 @@ class Zalo(Thread):
     def update(self, group_name: str, member_start_id: int, member_end_id: int, msg: str, sleep: float, profile):
         self.profile = profile
         self.chrome = None
-        self.group_name = group_name
+        self.group_name = re.sub(r"[\n\r\t]", "", group_name)
         self.member_index_id = int(member_start_id)
         self.member_index_stop_id = int(member_end_id)
         self.msg = msg
@@ -60,6 +62,7 @@ class Zalo(Thread):
         )))
         search_input[0].click()
         search_input[0].send_keys(self.group_name)
+        time.sleep(2)
         search_item: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
             By.CSS_SELECTOR,
             f'div[id*="group-item-g"]'
@@ -77,55 +80,56 @@ class Zalo(Thread):
             "div.chat-box-member__info__name.v2"
         )))
 
-        while self.member_index_id < self.member_index_stop_id:
-            name_el: WebElement = member_list[self.member_index_id].find_element(by=By.CSS_SELECTOR, value="div.truncate")
-            name_member:str = name_el.text
-            if not name_member:
-                continue
-            flag = re.search("Tài khoản bị khóa", name_member) or re.search("Account(.*)Banned", name_member)
-            if flag:
-                print(f"------STT   {self.member_index_id}-------")
-                print("------Tài khoản bị khóa-----")
-                print("----------------------------------------------------------------")
-                self.member_index_id +=1
-            else:
-                print(">>>>>>Gửi tin nhắn cho ", name_member)
-                member_list[self.member_index_id].click()
-                btn_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
-                    By.CSS_SELECTOR,
-                    'div[data-translate-inner="STR_CHAT"]'
-                )))
-                btn_msg[0].click()
-                time.sleep(2)
-                send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
-                    By.CSS_SELECTOR,
-                    "div#input_line_0"
-                )))
-                send_msg[0].send_keys(self.msg)
-                time.sleep(1)
-                qick_message: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
-                                    By.CSS_SELECTOR,
-                                    'div[class="qri clickable active"]'
-                                )))
-                time.sleep(0.5)
-                qick_message[0].click()
-                time.sleep(3)
-                btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
-                    By.CSS_SELECTOR,
-                    'div[data-translate-inner="STR_SEND"]'
-                )))
-                btn_send_msg[0].click()
-                print(f"------STT   {self.member_index_id}-------")
-                print("------Đã gửi thành công-----")
-                print("----------------------------------------------------------------")
-                self.tree_update()
-                time.sleep(self.sleep)
-                break
+        
+        name_el: WebElement = member_list[self.member_index_id].find_element(by=By.CSS_SELECTOR, value="div.truncate")
+        name_member:str = name_el.text
+        if not name_member:
+            return
+        flag = re.search("Tài khoản bị khóa", name_member) or re.search("Account(.*)Banned", name_member)
+        if flag:
+            print(f"------STT   {self.member_index_id}-------")
+            print("------Tài khoản bị khóa-----")
+            print("----------------------------------------------------------------")
+            self.member_index_id +=1
+        else:
+            print(">>>>>>Gửi tin nhắn cho ", name_member)
+            member_list[self.member_index_id].click()
+            btn_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
+                By.CSS_SELECTOR,
+                'div[data-translate-inner="STR_CHAT"]'
+            )))
+            btn_msg[0].click()
+            time.sleep(2)
+            send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
+                By.CSS_SELECTOR,
+                "div#input_line_0"
+            )))
+            send_msg[0].send_keys(self.msg)
+            time.sleep(1)
+            qick_message: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
+                                By.CSS_SELECTOR,
+                                'div[class="qri clickable active"]'
+                            )))
+            time.sleep(0.5)
+            qick_message[0].click()
+            time.sleep(3)
+            btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
+                By.CSS_SELECTOR,
+                'div[data-translate-inner="STR_SEND"]'
+            )))
+            btn_send_msg[0].click()
+            print(f"------STT   {self.member_index_id}-------")
+            print("------Đã gửi thành công-----")
+            print("----------------------------------------------------------------")
+            self.tree_update()
+            time.sleep(self.sleep)
+            
+                
 
     def stop(self):
         self.is_stop = True
         if self.chrome:
-            self.chrome.quit()
+            self.chrome.close()
         del self
 
     def run(self):
@@ -142,7 +146,7 @@ class Zalo(Thread):
                     print(f"Group {self.group_name} OK rồi nha ")
                     break
             except Exception as e:
-                print(e)
+                _logger.error(e)
                 self.stop()
                 break
                 # print("Có lỗi xảy ra đang khởi động lại Chrome")
