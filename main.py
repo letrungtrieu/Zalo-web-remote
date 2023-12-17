@@ -1,6 +1,9 @@
 from zalo import Zalo
 import json
-import os,sys
+import os,sys,requests,subprocess
+
+__version__ = "1.0.2"
+DETACHED_PROCESS = 0x00000008
 
 def read_str():
     fd = sys.stdin.fileno()
@@ -12,7 +15,7 @@ def kill_all_chrome():
     os.system('taskkill /f /im python.exe')
     os.system('cls' if os.name=='nt' else 'clear')
 
-if __name__=='__main__':
+def start():
     zalos:list[Zalo] = []
 
     with open('config.json',  encoding='utf-8') as f:
@@ -34,3 +37,17 @@ if __name__=='__main__':
     
     for t in zalos:
         t.join()
+        
+def check_update():
+    res = requests.get("http://zalo.dichvugame.org/version.txt")
+    version = res.content.decode()
+    
+    if __version__ != version and res.status_code == 200:
+        subprocess.Popen(f"timeout 5 && move Zalo.exe Zalo_{__version__}.exe &&curl -o Zalo.exe http://zalo.dichvugame.org/download/Zalo_{version}.exe", shell=True, creationflags=DETACHED_PROCESS)
+        return False
+    return True
+        
+
+if __name__=='__main__':
+    if check_update():
+        start()
