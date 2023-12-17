@@ -62,10 +62,11 @@ class Zalo(Thread):
             "div.chat-box-member__info__name.v2"
         )))
 
-        while self.member_index_id < self.member_index_stop_id:
+        while self.member_index_id < self.member_index_stop_id or len(member_list) > self.member_index_id:
             name_el: WebElement = member_list[self.member_index_id].find_element(by=By.CSS_SELECTOR, value="div.truncate")
             name_member:str = name_el.text
             if not name_member:
+                self.member_index_id += 1
                 continue
             flag = re.search("Tài khoản bị khóa", name_member) or re.search("Account(.*)Banned", name_member)
             if flag:
@@ -104,9 +105,6 @@ class Zalo(Thread):
                 print("----------------------------------------------------------------")
                 time.sleep(self.sleep)
                 break
-        
-        
-        
 
     def stop(self):
         self.is_stop = True

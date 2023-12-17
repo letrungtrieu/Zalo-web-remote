@@ -39,11 +39,11 @@ def start():
         t.join()
         
 def check_update():
-    res = requests.get("http://zalo.dichvugame.org/version.txt")
+    res = requests.get("http://zalo.dichvugame.org/download/version.txt")
     version = res.content.decode()
     
     if __version__ != version and res.status_code == 200:
-        subprocess.Popen(f"timeout 5 && move Zalo.exe Zalo_{__version__}.exe &&curl -o Zalo.exe http://zalo.dichvugame.org/download/Zalo_{version}.exe", shell=True, creationflags=DETACHED_PROCESS)
+        subprocess.Popen(f"timeout 5 && curl -o Zalo.exe http://zalo.dichvugame.org/download/Zalo_{version}.exe", shell=True, creationflags=DETACHED_PROCESS)
         return False
     return True
         
