@@ -92,9 +92,8 @@ class Zalo(Thread):
                                     By.CSS_SELECTOR,
                                     'div[class="qri clickable active"]'
                                 )))
-                time.sleep(3)
                 qick_message[0].click()
-                time.sleep(3)
+                time.sleep(1)
                 btn_send_msg: list[WebElement] = self.wait_element.until(E.presence_of_all_elements_located((
                     By.CSS_SELECTOR,
                     'div[data-translate-inner="STR_SEND"]'
